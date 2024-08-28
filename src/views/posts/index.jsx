@@ -58,7 +58,7 @@ export default function PostIndex() {
                   <td className="text-center" colSpan="4">
                     <div className="alert alert-danger mb-0">
                       Tidak ada data POST
-                    </div>
+                    </div>  
                   </td>
                 </tr>
               )}
