@@ -41,15 +41,16 @@ export default function PostIndex() {
                 {posts && posts.length > 0 ? (posts.map((post, index) => (
                   <tr key={index}>
                     <td className="text-center">
-                      <img src="{post.image}" alt={post.title} width="200" className="rounded" />
+                      <img src={post.image} alt={post.title} width="200" className="rounded" />
                     </td>
-                    <td>{post.title}</td>
-                    <td>{post.content}</td>
-                    <td className="text-center">
-                      <Link to={`/posts/edit.${post.id}`} className="btn btn-sm btn-info rounded-sm shadow border-0 me-2">EDIT</Link>
+                    <td className="align-middle">{post.title}</td>
+                    <td className="align-middle">{post.content}</td>
+                    <td className="text-center align-middle">
+                      <Link to={`/posts/edit/${post.id}`} className="btn btn-sm btn-info rounded-sm shadow border-0 mx-2">EDIT</Link>
+                     
                     </td>
-                    <td className="text-center">
-                      <button className="btn btn-sm btn-danger rounded-sm shadow border-0 me-2">HAPUS</button>
+                    <td className="text-center align-middle">
+                    <button className="btn btn-sm btn-danger rounded-sm shadow border-0 mx-2">HAPUS</button>
                     </td>
                   </tr>
                ))
