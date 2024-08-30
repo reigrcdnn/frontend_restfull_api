@@ -91,7 +91,7 @@ export default function PostCreate() {
                   Simpan
                 </button>
                 <button type="reset" className="btn btn-secondary btn-lg mx-1">
-                  Reset
+                  Reset 
                 </button>
               </form>
             </div>
