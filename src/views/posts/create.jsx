@@ -1,42 +1,44 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 export default function PostCreate() {
-  //mendefinisikan state
+  // Define state
   const [image, setImage] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
-  ///validasi data
   const [errors, setErrors] = useState("");
-  const navigate = useNavigate([]);
+  const navigate = useNavigate();
 
-  //membuat method pengaturan perubahan file
+  // Handle file change
   const handleFileChange = (e) => {
     setImage(e.target.files[0]);
   };
-  //method kirim data store post
+
+  // Store post
   const storePost = async (e) => {
     e.preventDefault();
 
-    //inisialisasi form data
+    // Initialize form data
     const formData = new FormData();
-
-    //menyimpan data
     formData.append("image", image);
     formData.append("title", title);
     formData.append("content", content);
 
-    //set API for send data
-    await api
-      .post("/api/posts", formData)
-      .then(() => {
+    try {
+      await api.post("/api/posts", formData);
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data berhasil ditambah',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
         navigate("/posts");
-      })
-      .catch((error) => {
-        setErrors(error.response.data);
       });
+    } catch (error) {
+      setErrors(error.response.data);
+    }
   };
 
   return (
@@ -84,4 +86,3 @@ export default function PostCreate() {
     </div>
   );
 }
-

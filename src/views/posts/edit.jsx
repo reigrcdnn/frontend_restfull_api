@@ -1,59 +1,70 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 export default function PostCreate() {
-  //mendefinisikan state
-  const [image, setImage] = useState("");
+  // Define state
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(""); // State for image preview URL
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
-  ///validasi data
   const [errors, setErrors] = useState("");
-  const navigate = useNavigate([]);
 
-  //Mengambil data berdasarkan id
+  const navigate = useNavigate();
   const { id } = useParams();
 
-  //membuat method fetchDetailPost
+  // Fetch post details based on ID
   const fetchDetailPost = async () => {
-    await api.get(`/api/posts/${id}`).then((response) => {
-      setTitle(response.data.data.title);
-      setContent(response.data.data.content);
-    });
+    try {
+      const response = await api.get(`/api/posts/${id}`);
+      const { title, content, image } = response.data.data;
+      setTitle(title);
+      setContent(content);
+      setImagePreview(image); // Set the image preview URL
+    } catch (error) {
+      console.error("Error fetching post details", error);
+    }
   };
 
-  //hook useEffect
+  // Hook useEffect to fetch data on component mount
   useEffect(() => {
     fetchDetailPost();
-  }, []);
+  }, [id]);
 
-  //membuat method pengaturan perubahan file
+  // Handle file change
   const handleFileChange = (e) => {
     setImage(e.target.files[0]);
+    // Create a URL for the new image file and set it to imagePreview
+    if (e.target.files[0]) {
+      setImagePreview(URL.createObjectURL(e.target.files[0]));
+    }
   };
-  //method kirim data store post
+
+  // Update post
   const updatePost = async (e) => {
     e.preventDefault();
 
-    //inisialisasi form data
+    // Initialize form data
     const formData = new FormData();
-
-    //menyimpan data
-    formData.append("image", image);
+    if (image) formData.append("image", image); // Append image only if it is selected
     formData.append("title", title);
     formData.append("content", content);
     formData.append("_method", "PUT");
 
-    //set API for send data
-    await api
-      .post(`/api/posts/${id}`, formData)
-      .then(() => {
+    try {
+      await api.post(`/api/posts/${id}`, formData);
+      Swal.fire({
+        title: 'Updated!',
+        text: 'Post has been updated successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
         navigate("/posts");
-      })
-      .catch((error) => {
-        setErrors(error.response.data);
       });
+    } catch (error) {
+      setErrors(error.response.data);
+    }
   };
 
   return (
@@ -69,21 +80,49 @@ export default function PostCreate() {
                     <label htmlFor="formFile" className="form-label">
                       Gambar
                     </label>
-                    <input className="form-control" type="file" onChange={handleFileChange} id="formFile" />
+                    {imagePreview && (
+                      <div className="mb-3">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          style={{ maxWidth: "100%", maxHeight: "200px" }}
+                          className="img-thumbnail mb-2"
+                        />
+                      </div>
+                    )}
+                    <input
+                      className="form-control"
+                      type="file"
+                      onChange={handleFileChange}
+                      id="formFile"
+                    />
                     {errors.image && <div className="alert alert-danger mt-2">{errors.image[0]}</div>}
                   </div>
                   <div className="mb-3">
                     <label htmlFor="exampleFormControlInput1" className="form-label">
-                      Tittle
+                      Title
                     </label>
-                    <input type="text" className="form-control" onChange={(e) => setTitle(e.target.value)} id="title" placeholder="judul" value={title} />
+                    <input
+                      type="text"
+                      className="form-control"
+                      onChange={(e) => setTitle(e.target.value)}
+                      id="title"
+                      placeholder="judul"
+                      value={title}
+                    />
                     {errors.title && <div className="alert alert-danger mt-2">{errors.title[0]}</div>}
                   </div>
                   <div className="mb-3">
                     <label htmlFor="exampleFormControlTextarea1" className="form-label">
                       Content
                     </label>
-                    <textarea className="form-control" id="exampleFormControlTextarea1" rows="3" onChange={(e) => setContent(e.target.value)} value={content} />
+                    <textarea
+                      className="form-control"
+                      id="exampleFormControlTextarea1"
+                      rows="3"
+                      onChange={(e) => setContent(e.target.value)}
+                      value={content}
+                    />
                     {errors.content && <div className="alert alert-danger mt-2">{errors.content[0]}</div>}
                   </div>
                 </div>
